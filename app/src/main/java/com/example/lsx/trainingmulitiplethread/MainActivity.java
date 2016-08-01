@@ -3,6 +3,9 @@ package com.example.lsx.trainingmulitiplethread;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +22,22 @@ public class MainActivity extends AppCompatActivity {
     private Button mLoadimagebutton;
     private Button mToastbutton;
     private ProgressBar mProgressbar;
+    private Handler mHandle = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 0:
+                    mProgressbar.setVisibility(View.VISIBLE);
+                    break;
+                case 1:
+                    mProgressbar.setProgress((int) msg.obj);
+                    break;
+            }
+            mProgressbar.setVisibility(View.VISIBLE);
+
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +70,23 @@ public class MainActivity extends AppCompatActivity {
                 mImageview.post(new Runnable() {
                     @Override
                     public void run() {
-                        mImageview.setImageBitmap(bitmap);
+                        Message msg =new Message();
+                        msg.what=0;
+                        mHandle.sendMessage(msg);
+                        for(int i=1;i<11;i++){
+                            sleep();
+                            Message msg2=new Message();
+                            msg.what=0;
+                            mHandle.sendMessage(msg);
+                            msg2.what=1;
+                            msg2.what=i*10;
+                            mHandle.sendMessage(msg2);
+
+
+
+                        }
                     }
+
                 });
             }
         }).start();
